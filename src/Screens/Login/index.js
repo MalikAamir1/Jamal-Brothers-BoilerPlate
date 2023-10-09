@@ -17,11 +17,8 @@ import ButtonComp from '../../Components/ReusableComponent/Button';
 import Heading from '../../Components/ReusableComponent/Heading';
 import Input from '../../Components/ReusableComponent/Input';
 import * as yup from 'yup';
-// import GoogleAuth from '../../Components/GoogleAuth';
-// import FaceBookAuth from '../../Components/FaceBook';
 
 import {useNavigation} from '@react-navigation/native';
-// import {BASE_URL} from '../../App/api';
 import InteractParagraph from '../../Components/ReusableComponent/Paragraph';
 import {
   getDataFromAsync,
@@ -30,7 +27,8 @@ import {
 import {userDataFromAsyncStorage} from '../../Store/Reducers/AuthReducer';
 import {useDispatch, useSelector} from 'react-redux';
 import {Loader} from '../../Components/ReusableComponent/Loader';
-// import {FaceBookAuth} from '../../Components/Facebook';
+import {BASE_URL} from '../../App/api';
+import {postRequest} from '../../App/fetch';
 
 export const Login = () => {
   const [passHide, setPassHide] = useState(false);
@@ -90,11 +88,11 @@ export const Login = () => {
 
   function Login() {
     if (valueEmail.trim() === '') {
-      onChangeError('Email Id should not be Empty');
+      onChangeError('Email cannot be empty.');
     } else if (!isValidEmail(valueEmail)) {
-      onChangeError('Invalid email format');
+      onChangeError('Enter valid email');
     } else if (valuePass.trim() === '') {
-      onChangeError('Password should not be Empty');
+      onChangeError('Password cannot be empty');
     } else if (!hasValidPassword(valuePass)) {
       onChangeError(
         'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one digit, and one special character.',
@@ -103,8 +101,66 @@ export const Login = () => {
       console.log('valueEmail: ', valueEmail);
       console.log('valuePass: ', valuePass);
       console.log('Match');
+      var formdataEmail = new FormData();
+      formdataEmail.append('email', valueEmail);
 
-      onChangeError('');
+      setLoading(true);
+
+      postRequest(`${BASE_URL}/users/verify-email-exists/`, formdataEmail)
+        .then(result => {
+          // setLoading(false);
+          console.log('Result: ', result.success);
+          if (result.success) {
+            setLoading(false);
+            var formdata = new FormData();
+            formdata.append('username', valueEmail);
+            formdata.append('password', valuePass);
+
+            setLoading(true);
+            postRequest(`${BASE_URL}/users/login/token/`, formdata)
+              .then(result => {
+                console.log(result);
+                setLoading(false);
+                if (result?.non_field_errors) {
+                  console.log('Not found');
+                  Alert.alert('', 'Invalid Password');
+                } else {
+                  setDataToAsync('token', JSON.stringify(result.token));
+                  setDataToAsync('user', JSON.stringify(result));
+
+                  getDataFromAsync('user')
+                    .then(res => {
+                      dispatch(userDataFromAsyncStorage(JSON.parse(res)));
+                      // console.log('res: ', res);
+                    })
+                    .catch(err => {
+                      console.log(
+                        'Error From getting from local storage: ',
+                        err,
+                      );
+                    });
+
+                  // Navigation.navigate('SimpleBottomTab', result);
+                }
+                // onChangeTextEmail('');
+                // onChangeTextPass('');
+              })
+              .catch(error => {
+                console.log('error', error);
+                setLoading(false);
+              });
+          } else {
+            setLoading(false);
+            onChangeError('');
+            Alert.alert('', 'Invalid Email');
+          }
+        })
+        .catch(error => {
+          setLoading(false);
+          console.log('error', error);
+          // onChangeTextEmail('');
+        });
+      // onChangeError('');
     }
   }
 
@@ -133,21 +189,19 @@ export const Login = () => {
             {loading ? (
               <Loader />
             ) : (
-              // <ImageBackground
-              //   source={require('../../Assets/Images/bg.png')}
-              //   resizeMode="cover"
-              //   style={{flex: 1}}>
               <ScrollView contentContainerStyle={{flexGrow: 1}}>
                 {/* Add this line */}
                 <View
                   style={{
                     alignItems: 'center',
                     marginTop: Platform.OS === 'ios' ? '25%' : 45,
+                    width: 170,
+                    height: 150,
+                    backgroundColor: 'white',
                   }}>
                   {/* <Image
-                    // source={require('../../Assets/Images/logIcon.png')}
-                    source={require('../../Assets/Images/logicon2.png')}
-                    style={{width: 140, height: 150}}
+                    source={require('../../Assets/Images/logicon.png')}
+                    style={{width: 170, height: 150}}
                     resizeMode={'contain'}
                   /> */}
                 </View>
@@ -158,57 +212,12 @@ export const Login = () => {
                     padding: 15,
                     borderRadius: 15,
                   }}>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      marginHorizontal: 35,
-                      marginVertical: 10,
-                    }}>
-                    <Text
-                      style={{
-                        fontWeight: 'bold',
-                        fontSize: 20,
-                        color: '#BA7607',
-                      }}>
-                      Sign In
-                    </Text>
-                    <Pressable
-                      onPress={() => {
-                        Navigation.navigate('SignUp');
-                      }}>
-                      <Text
-                        style={{
-                          fontWeight: 'bold',
-                          fontSize: 20,
-                          color: '#A8A8A8',
-                        }}>
-                        Sign Up
-                      </Text>
-                    </Pressable>
-                  </View>
-
-                  <View style={styles.line}>
-                    <View
-                      style={[
-                        styles.colorSection,
-                        {flex: 1, backgroundColor: '#BA7607'},
-                      ]}
-                    />
-                    <View
-                      style={[
-                        styles.colorSection,
-                        {flex: 1, backgroundColor: '#A8A8A8'},
-                      ]}
-                    />
-                  </View>
-
                   <View>
-                    <View style={{marginBottom: '1%', marginTop: '4%'}}>
+                    <View style={{marginBottom: '5%', marginTop: '10%'}}>
                       <Input
-                        title={'Email ID'}
-                        // urlImg={require('../../Assets/Images/emailIcon.png')}
-                        placeholder={'John Doe@domain.com'}
+                        title={'Email / Phone'}
+                        urlImg={require('../../Assets/Images/emailIcon.png')}
+                        placeholder={'email@domain.com'}
                         pass={false}
                         value={valueEmail}
                         onChangeText={onChangeTextEmail}
@@ -229,8 +238,8 @@ export const Login = () => {
                     <View style={{marginVertical: '3%'}}>
                       <Input
                         title={'Password'}
-                        // urlImg={require('../../Assets/Images/passIcon.png')}
-                        placeholder={'************0'}
+                        urlImg={require('../../Assets/Images/passIcon.png')}
+                        placeholder={'***********'}
                         pass={'true'}
                         value={valuePass}
                         onChangeText={onChangeTextPass}
@@ -251,36 +260,19 @@ export const Login = () => {
 
                     <View
                       style={{
-                        justifyContent: 'space-between',
-                        alignContent: 'center',
-                        flexDirection: 'row',
                         marginHorizontal: -15,
+                        alignContent: 'flex-end',
+                        alignItems: 'flex-end',
                       }}>
-                      <View
-                        style={{
-                          alignSelf: 'center',
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                        }}>
-                        <Switch
-                          trackColor={{false: 'black', true: '#BA7607'}}
-                          thumbColor={isEnabled ? 'white' : '#f4f3f4'}
-                          ios_backgroundColor="#BA7607"
-                          onValueChange={toggleSwitch}
-                          value={isEnabled}
-                          style={{
-                            transform: [{scaleX: 0.6}, {scaleY: 0.6}],
-                          }}
-                        />
-                        <Text style={{color: '#667080', fontSize: 14}}>
-                          Remember me
-                        </Text>
-                      </View>
-
                       <Button
                         textColor={'#667080'}
                         onPress={() => Navigation.navigate('ForgotPassword')}>
-                        <Text style={{color: '#667080', fontSize: 14}}>
+                        <Text
+                          style={{
+                            color: '#1C1C1C',
+                            fontSize: 14,
+                            textAlign: 'right',
+                          }}>
                           {' '}
                           Forgot Password?
                         </Text>
@@ -293,10 +285,12 @@ export const Login = () => {
                       justifyContent: 'center',
                       alignContent: 'center',
                       flexDirection: 'row',
-                      marginVertical: '4%',
+                      marginVertical: '5%',
+                      marginLeft: '-2%',
+                      // marginTop: '5%',
                     }}>
                     <ButtonComp
-                      btnText={'Sign In'}
+                      btnText={'Login'}
                       press={() => {
                         // Navigation.navigate('SimpleBottomTab');
                         Login();
@@ -323,55 +317,67 @@ export const Login = () => {
                   <View
                     style={{
                       flexDirection: 'row',
-                      marginTop: 10,
+                      marginTop: 30,
                       alignSelf: 'center',
                     }}>
-                    {/* <GoogleAuth /> */}
-                    {/* <FaceBookAuth /> */}
                     <Pressable
                       onPress={() => {
-                        // Navigation.navigate('SimpleBottomTab');
+                        // Navigation.navigate('SimpleBottomScreen');
                       }}>
-                      {/* <Image
-                        source={require('../../Assets/Images/twiterIcon.png')}
-                        style={{width: 70, height: 70}}
-                      /> */}
+                      <Image
+                        source={require('../../Assets/Images/googleicon.png')}
+                        style={{width: 30, height: 34, marginRight: '10%'}}
+                      />
+                    </Pressable>
+                    <Pressable
+                      onPress={() => {
+                        // Navigation.navigate('SimpleBottomScreen');
+                      }}>
+                      <Image
+                        source={require('../../Assets/Images/facebookicon.png')}
+                        style={{width: 30, height: 35, marginRight: '12%'}}
+                      />
+                    </Pressable>
+                    <Pressable
+                      onPress={() => {
+                        // Navigation.navigate('SimpleBottomScreen');
+                      }}>
+                      <Image
+                        source={require('../../Assets/Images/appleicon.png')}
+                        style={{width: 28, height: 30}}
+                      />
                     </Pressable>
                   </View>
                   <View
                     style={{
                       flexDirection: 'row',
-                      marginTop: 10,
+                      marginTop: Platform.OS === 'ios' ? 150 : 110,
                       alignSelf: 'center',
                     }}>
                     <Heading
-                      Fontsize={15}
+                      Fontsize={16}
                       as={'center'}
                       Heading={"Don't have an account?"}
-                      // color={COLORS.dark}
+                      color={'#1C1C1C'}
                     />
-                    <Button
-                      textColor={'#514C4A'}
-                      style={{marginLeft: -8}}
-                      onPress={() => Navigation.navigate('SignUp')}>
-                      <Text
-                        style={{
-                          textDecorationLine: 'underline',
-                          color: '#514C4A',
-                          fontWeight: 'bold',
-                        }}>
-                        Sign Up
-                      </Text>
-                    </Button>
+                    <Pressable
+                      onPress={() => Navigation.navigate('SignUp')}
+                      style={{marginLeft: 3}}>
+                      <Heading
+                        Fontsize={16}
+                        // as={'center'}
+                        Heading={'Sign Up'}
+                        color={'#407BFF'}
+                        Fontweight={'bold'}
+                      />
+                    </Pressable>
                   </View>
                 </View>
               </ScrollView>
-              // </ImageBackground>
             )}
           </>
         )}
       </Formik>
-      {/* </SafeArea> */}
     </>
   );
 };
@@ -387,16 +393,19 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginLeft: '8%',
+    marginTop: 20,
   },
   line2: {
-    flex: 1,
+    // flex: 1,
     height: 1,
+    width: '39%',
     backgroundColor: '#D0CBBB',
   },
   text: {
     marginHorizontal: 10,
     fontSize: 16,
-    fontWeight: 'bold',
-    color: 'black',
+    // fontWeight: 'bold',
+    color: '#514C4A',
   },
 });

@@ -21,6 +21,8 @@ import InteractParagraph from '../../Components/ReusableComponent/Paragraph';
 // import {postRequest} from '../../App/fetch';
 // import {BASE_URL} from '../../App/api';
 import {Loader} from '../../Components/ReusableComponent/Loader';
+import {postRequest} from '../../App/fetch';
+import {BASE_URL} from '../../App/api';
 
 export const SignUp = () => {
   let loginValidationScheme = yup.object().shape({
@@ -83,7 +85,7 @@ export const SignUp = () => {
   function onPressSignUp() {
     if (valueEmail !== '') {
       if (!isValidEmail(valueEmail)) {
-        onChangeError('Invalid email format');
+        onChangeError('Enter valid email');
       } else if (valuePass !== '') {
         if (valueConfirmPass !== '') {
           if (valuePass === valueConfirmPass) {
@@ -92,6 +94,52 @@ export const SignUp = () => {
               console.log('valuePass: ', valuePass);
               console.log('valueConfirmPass: ', valueConfirmPass);
               console.log('Match');
+              // Navigation.navigate('TermofServices');
+              // onChangeError('');
+              var formdataEmail = new FormData();
+              formdataEmail.append('email', valueEmail);
+
+              setLoading(true);
+
+              //Email Check Start
+              postRequest(
+                `${BASE_URL}/users/verify-email-exists/`,
+                formdataEmail,
+              )
+                .then(result => {
+                  // setLoading(false);
+                  console.log('Result: ', result.success);
+
+                  if (result.success) {
+                    Alert.alert('Account Exists', result.message);
+                    setLoading(false);
+                    onChangeTextEmail('');
+                    onChangeTextPass('');
+                    onChangeTextConfirmPass('');
+                  } else {
+                    setLoading(false);
+                    const data = {
+                      valueEmail: valueEmail,
+                      valuePass: valuePass,
+                      screenName: 'ProfileCreated',
+                    };
+                    onChangeTextEmail('');
+                    onChangeTextPass('');
+                    onChangeTextConfirmPass('');
+                    console.log('Done');
+                    Navigation.navigate('TermofServices', data);
+                  }
+                })
+                .catch(error => {
+                  setLoading(false);
+                  console.log('error', error);
+                  onChangeTextEmail('');
+                  onChangeTextPass('');
+                  onChangeTextConfirmPass('');
+                });
+              //Email Check End
+
+              // Signup Backend End
 
               onChangeError('');
             } else {
@@ -108,10 +156,10 @@ export const SignUp = () => {
           onChangeError('Confirm Password should not be Empty');
         }
       } else {
-        onChangeError('Password should not be Empty');
+        onChangeError('Password cannot be empty');
       }
     } else {
-      onChangeError('Email Id should not be Empty');
+      onChangeError('Email cannot be empty.');
     }
   }
 
@@ -129,42 +177,61 @@ export const SignUp = () => {
             {loading ? (
               <Loader />
             ) : (
-              // <ImageBackground
-              //   source={require('../../Assets/Images/bg.png')}
-              //   resizeMode="cover"
-              //   style={{flex: 1}}>
               <ScrollView
                 contentContainerStyle={{
                   flexGrow: 1,
-                  marginTop: Platform.OS === 'ios' ? '10%' : 8,
+                  marginTop: Platform.OS === 'ios' ? '10%' : 6,
                 }}>
                 <View
                   style={{
                     flexDirection: 'row',
                     margin: '8%',
+                    marginBottom: 0,
                   }}>
                   <Pressable
                     onPress={() => {
-                      Navigation.goBack();
+                      Navigation.navigate('login');
                     }}>
-                    {/* <Image
+                    <Image
                       source={require('../../Assets/Images/back.png')}
                       style={{
-                        width: 30,
-                        height: 30,
+                        width: 18,
+                        height: 15,
                         alignContent: 'center',
                         alignItems: 'center',
                         alignSelf: 'center',
                       }}
-                    /> */}
+                    />
                   </Pressable>
+                  <View
+                    style={{
+                      width: '80%',
+                      // alignItemss: 'center',
+                      marginLeft: 20,
+                      textAlign: 'center',
+                    }}>
+                    {error && (
+                      <>
+                        <InteractParagraph
+                          p={error}
+                          color={'red'}
+                          txtAlign={'center'}
+                        />
+                      </>
+                    )}
+                  </View>
                 </View>
-
-                <View style={{alignItems: 'center'}}>
+                <View
+                  style={{
+                    alignItems: 'center',
+                    marginTop: Platform.OS === 'ios' ? 13 : 0,
+                    width: 170,
+                    height: 150,
+                    backgroundColor: 'white',
+                  }}>
                   {/* <Image
-                    // source={require('../../Assets/Images/logIcon.png')}
-                    source={require('../../Assets/Images/logicon2.png')}
-                    style={{width: 150, height: 120}}
+                    source={require('../../Assets/Images/logicon.png')}
+                    style={{width: 170, height: 150}}
                     resizeMode={'contain'}
                   /> */}
                 </View>
@@ -176,58 +243,12 @@ export const SignUp = () => {
                     padding: 15,
                     borderRadius: 15,
                   }}>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      marginHorizontal: 35,
-                      marginVertical: 10,
-                    }}>
-                    <Pressable
-                      onPress={() => {
-                        Navigation.navigate('login');
-                      }}>
-                      <Text
-                        style={{
-                          fontWeight: 'bold',
-                          fontSize: 20,
-                          color: '#A8A8A8',
-                        }}>
-                        Sign In
-                      </Text>
-                    </Pressable>
-                    <Text
-                      style={{
-                        fontWeight: 'bold',
-                        fontSize: 20,
-                        color: '#BA7607',
-                      }}>
-                      Sign Up
-                    </Text>
-                  </View>
-
-                  <View style={styles.line}>
-                    <View
-                      style={[
-                        styles.colorSection,
-                        {flex: 1, backgroundColor: '#A8A8A8'},
-                      ]}
-                    />
-                    <View
-                      style={[
-                        styles.colorSection,
-                        {flex: 1, backgroundColor: '#BA7607'},
-                      ]}
-                    />
-                  </View>
-                  {/* </Pressable> */}
-
                   <View>
-                    <View style={{marginBottom: '2%', marginTop: '5%'}}>
+                    <View style={{marginBottom: '5%', marginTop: '10%'}}>
                       <Input
-                        title={'Email ID'}
-                        // urlImg={require('../../Assets/Images/emailIcon.png')}
-                        placeholder={'John Doe@domain.com'}
+                        title={'Email / Phone'}
+                        urlImg={require('../../Assets/Images/emailIcon.png')}
+                        placeholder={'Email@domain.com'}
                         pass={false}
                         value={valueEmail}
                         onChangeText={onChangeTextEmail}
@@ -246,11 +267,11 @@ export const SignUp = () => {
                       )}
                     </View>
 
-                    <View style={{marginVertical: '2%'}}>
+                    <View style={{marginVertical: '3%'}}>
                       <Input
                         title={'Password'}
-                        // urlImg={require('../../Assets/Images/passIcon.png')}
-                        placeholder={'************0'}
+                        urlImg={require('../../Assets/Images/passIcon.png')}
+                        placeholder={'***********'}
                         pass={'true'}
                         value={valuePass}
                         onChangeText={onChangeTextPass}
@@ -269,11 +290,11 @@ export const SignUp = () => {
                       )}
                     </View>
 
-                    <View style={{marginVertical: '2%'}}>
+                    <View style={{marginVertical: '3%'}}>
                       <Input
                         title={'Confirm Password'}
-                        // urlImg={require('../../Assets/Images/passIcon.png')}
-                        placeholder={'************0'}
+                        urlImg={require('../../Assets/Images/passIcon.png')}
+                        placeholder={'***********'}
                         pass={'true'}
                         value={valueConfirmPass}
                         onChangeText={onChangeTextConfirmPass}
@@ -293,33 +314,19 @@ export const SignUp = () => {
                     </View>
                   </View>
 
-                  <View>
-                    {error && (
-                      <>
-                        <InteractParagraph p={error} mv={4} color={'red'} />
-                      </>
-                    )}
-                  </View>
-
                   <View
                     style={{
                       justifyContent: 'center',
                       alignContent: 'center',
                       flexDirection: 'row',
-                      marginVertical: '4%',
+                      marginVertical: '7%',
+                      marginLeft: '-2%',
+                      // marginTop: '5%',
                     }}>
                     <ButtonComp
-                      // btnwidth={'97%'}
-                      btnHeight={56}
                       btnText={'Sign Up'}
-                      justify={'center'}
-                      align={'center'}
-                      fontSize={16}
-                      radius={15}
-                      txtwidth={'100%'}
-                      // txtColor={COLORS.white}
                       press={() => {
-                        // Navigation.navigate('TermCondition');
+                        // Navigation.navigate('SimpleBottomTab');
                         onPressSignUp();
                       }}
                     />
@@ -328,31 +335,26 @@ export const SignUp = () => {
                   <View
                     style={{
                       flexDirection: 'row',
-                      marginTop: 10,
-                      alignContent: 'center',
+                      marginTop: Platform.OS === 'ios' ? 180 : 130,
                       alignSelf: 'center',
-                      alignItems: 'center',
                     }}>
                     <Heading
-                      Fontsize={15}
+                      Fontsize={16}
                       as={'center'}
                       Heading={'Already have an account?'}
-                      // color={COLORS.dark}
+                      color={'#1C1C1C'}
                     />
-
-                    <Button
-                      textColor={'black'}
-                      style={{marginLeft: -8}}
+                    <Pressable
+                      style={{marginLeft: 3}}
                       onPress={() => Navigation.navigate('login')}>
-                      <Text
-                        style={{
-                          textDecorationLine: 'underline',
-                          color: '#514C4A',
-                          fontWeight: 'bold',
-                        }}>
-                        Sign In
-                      </Text>
-                    </Button>
+                      <Heading
+                        Fontsize={16}
+                        // as={'center'}
+                        Heading={'Login'}
+                        color={'#407BFF'}
+                        Fontweight={'bold'}
+                      />
+                    </Pressable>
                   </View>
                 </View>
               </ScrollView>

@@ -1,80 +1,85 @@
-import axios from 'axios';
+// import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const postRequest = async (api, body) => {
+  var myHeaders = new Headers();
+  myHeaders.append('Cookie', 'sessionid=1qg58avyasqn5io3o5adtzbjv18f2vrn');
   const res = await fetch(api, {
-    method: 'post',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(body),
+    method: 'POST',
+    headers: myHeaders,
+    body: body,
     redirect: 'follow',
   });
   return await res.json();
 };
 
-export const getRequest = async api => {
+export const postRequestWithToken = async (api, body, token) => {
+  var myHeaders = new Headers();
+  myHeaders.append('Authorization', `Token ${token}`);
   const res = await fetch(api, {
-    method: 'GET',
-    // headers: {
-    //   Authorization: AsyncStorage.getItem('token'),
-    // },
-    headers: {
-      'X-RapidAPI-Host': 'yh-finance.p.rapidapi.com',
-      'X-RapidAPI-Key': '962392c32emshd35a2f6ad156d14p149d95jsn285528aa0957',
-    },
-    // params: param
-  });
-  return await res.json();
-};
-//Edit krna ka lia hota hain
-
-export const putRequest = async (api, body) => {
-  const res = await fetch(api, {
-    method: 'put',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: AsyncStorage.getItem('token'),
-    },
-
-    body: JSON.stringify(body),
-  });
-  return await res.json();
-};
-
-export const deleteRequest = async (api, body) => {
-  const res = await fetch(api, {
-    method: 'delete',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: AsyncStorage.getItem('token'),
-    },
-
-    body: JSON.stringify(body),
-  });
-  return await res.json();
-};
-
-export const getDataByBody = async (api, body) => {
-  const res = await axios.request({
     method: 'POST',
-    url: api,
-    headers: {
-      Authorization: AsyncStorage.getItem('token'),
-    },
-    data: body,
+    headers: myHeaders,
+    body: body,
+    redirect: 'follow',
   });
-  return await res.data;
+  return await res.json();
+};
+export const postRequestWithTokenAndCookie = async (api, body, token) => {
+  var myHeaders = new Headers();
+  myHeaders.append('Authorization', `Token ${token}`);
+  myHeaders.append('Cookie', 'sessionid=1qg58avyasqn5io3o5adtzbjv18f2vrn');
+  const res = await fetch(api, {
+    method: 'POST',
+    headers: myHeaders,
+    body: body,
+    redirect: 'follow',
+  });
+  return await res.json();
 };
 
-export const getDataByBodyParams = async (api, body) => {
-  const res = await axios.request({
+export const getRequestWithOutBody = async (api, token) => {
+  var myHeaders = new Headers();
+  myHeaders.append('Authorization', `Token ${token}`);
+  const res = await fetch(api, {
     method: 'GET',
-    url: api,
-    headers: {
-      Authorization: AsyncStorage.getItem('token'),
-    },
-    params: body,
+    headers: myHeaders,
+    redirect: 'follow',
   });
-  return await res.data;
+  // console.log('res ',res)
+  return res.json();
+};
+
+export const getRequestWithCookie = async (api, token) => {
+  var myHeaders = new Headers();
+  myHeaders.append('Authorization', `Token ${token}`);
+  myHeaders.append('Cookie', 'sessionid=1qg58avyasqn5io3o5adtzbjv18f2vrn');
+  const res = await fetch(api, {
+    method: 'GET',
+    headers: myHeaders,
+    redirect: 'follow',
+  });
+  // console.log('res ',res)
+  return res.json();
+};
+
+export const deleteRequest = async (api, token) => {
+  var myHeaders = new Headers();
+  myHeaders.append('Authorization', `Token ${token}`);
+  const res = await fetch(api, {
+    method: 'DELETE',
+    headers: myHeaders,
+  });
+  return await res.json();
+};
+
+export const putRequestWithToken = async (api, body, token) => {
+  var myHeaders = new Headers();
+  myHeaders.append('Authorization', `Token ${token}`);
+  const res = await fetch(api, {
+    method: 'PUT',
+    headers: myHeaders,
+    body: body,
+    redirect: 'follow',
+  });
+  return await res.json();
 };

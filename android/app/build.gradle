@@ -1,5 +1,10 @@
 apply plugin: "com.android.application"
 apply plugin: "com.facebook.react"
+apply from: file("../../node_modules/react-native-vector-icons/fonts.gradle")
+
+project.ext.vectoricons = [
+    iconFontNames: [ 'MaterialIcons.ttf','MaterialCommunityIcons.ttf', 'EvilIcons.ttf','SimpleLineIcons.ttf','AntDesign.ttf','Entypo.ttf','Ionicons.ttf','Foundation.ttf','Feather.ttf','FontAwesome.ttf' ] // Name of the font files you want to copy
+]
 
 /**
  * This is the configuration block to customize your React Native Android app.

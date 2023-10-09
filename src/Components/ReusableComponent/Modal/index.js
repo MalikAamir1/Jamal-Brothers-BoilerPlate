@@ -16,74 +16,70 @@ export const ModalView = props => {
   let {set, get, cross, txt, no, yes} = props;
 
   return (
-    <Modal
-      animationType="none"
-      transparent={true}
-      visible={get}
-      onRequestClose={() => {
-        Alert.alert('Modal has been closed.');
-        setModalVisible(!modalVisible);
-      }}>
+    <Modal animationType="none" transparent={true} visible={get}>
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
-          <View style={{alignSelf: 'flex-end', marginBottom: -20}}>
-            <Pressable onPress={cross}>
-              <Image
-                source={require('../../../Assets/Images/cross.png')}
-                style={{width: 15}}
-                resizeMode="contain"
-              />
-            </Pressable>
-          </View>
-          <View style={{marginBottom: 30, marginHorizontal: 30}}>
+          <View style={{marginBottom: 20, marginHorizontal: 20, marginTop: 40}}>
             <Heading
               Heading={txt}
-              Fontsize={22}
-            //   color={COLORS.dark}
-              // Fontweight={'bold'}
+              Fontsize={20}
+              //   color={COLORS.dark}
+              Fontweight={'bold'}
               txtAlign={'center'}
+              color={'rgba(11, 16, 92, 1)'}
             />
           </View>
-          <View style={{flexDirection: 'row'}}>
+
+          <View style={{flexDirection: 'row', marginBottom: 20}}>
             <TouchableOpacity
               style={{
                 flex: 1,
-                backgroundColor: '#FFFFFF',
+                backgroundColor: '#E1E1E1',
                 borderWidth: 1,
-                borderColor: '#000000',
-                padding: 5,
+                borderColor: 'rgba(11, 16, 92, 0.2)',
+                // borderColor: '#0B105C',
+                // padding: 5,
                 marginRight: 5,
                 justifyContent: 'center',
                 alignItems: 'center',
-                borderRadius: 20,
+                width: 111,
+                height: 36,
+                borderRadius: 7,
               }}
               onPress={no}>
               <Text
-                style={{color: '#000000', fontSize: 15, fontWeight: 'bold'}}>
+                style={{
+                  color: '#0B105C',
+                  fontSize: 14,
+                  // fontWeight: 'bold',
+                }}>
                 No
               </Text>
             </TouchableOpacity>
-
             <LinearGradient
-              colors={['#BA7607', '#EDCC45']}
+              colors={['#FCDD8E', '#F9B401']}
+              start={{x: 0.5, y: -5}}
+              end={{x: 0.4, y: 4}}
               style={{
                 flex: 1,
                 marginLeft: 5,
                 justifyContent: 'center',
                 alignItems: 'center',
-                borderRadius: 20,
+                width: 111,
+                borderRadius: 7,
               }}>
               <TouchableOpacity
                 style={{
-                  padding: 10,
-                  // backgroundColor: 'pink',
-                  width: 110,
-                  alignContent: 'center',
+                  width: 190,
                   alignItems: 'center',
                 }}
                 onPress={yes}>
                 <Text
-                  style={{color: '#FFFFFF', fontSize: 15, fontWeight: 'bold'}}>
+                  style={{
+                    color: '#0B105C',
+                    fontSize: 14,
+                    // fontWeight: 'bold',
+                  }}>
                   Yes
                 </Text>
               </TouchableOpacity>
@@ -100,16 +96,16 @@ export const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#25241C',
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
     // opacity: 0.9,
   },
   modalView: {
-    margin: 30,
+    margin: 50,
     backgroundColor: 'white',
     borderRadius: 20,
     paddingHorizontal: 20,
     // paddingTop: 0,
-    paddingBottom: 15,
+    // paddingBottom: 15,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: {
@@ -119,19 +115,19 @@ export const styles = StyleSheet.create({
     shadowOpacity: 0.9,
     shadowRadius: 4,
     elevation: 200,
-    opacity: 1000,
+    opacity: 1,
   },
   button: {
     borderRadius: 20,
     padding: 10,
     elevation: 2,
   },
-  buttonOpen: {
-    backgroundColor: '#F194FF',
-  },
-  buttonClose: {
-    backgroundColor: 'red',
-  },
+  // buttonOpen: {
+  //   backgroundColor: '#F194FF',
+  // },
+  // buttonClose: {
+  //   backgroundColor: 'red',
+  // },
   textStyle: {
     color: 'black',
     fontWeight: 'bold',
