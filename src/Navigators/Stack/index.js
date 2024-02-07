@@ -24,6 +24,8 @@ import {OtpScreen} from '../../Components/OtpScreen';
 import {ChangeForgetPassword} from '../../Screens/ChangeForgetPassword';
 import {TermofServices} from '../../Screens/TermsOfServices';
 import { ProfileCreate } from '../../Screens/ProfileCreate';
+import VideoCall from '../../Screens/VideoCall';
+// import VideoCall from '../../Screens/VideoCall';
 
 export default function StackNavigator({route, navigation}) {
   const Stack = createStackNavigator();
@@ -110,6 +112,7 @@ export default function StackNavigator({route, navigation}) {
         }}>
         {userData == null ? (
           <>
+            <Stack.Screen name="VideoCall" component={VideoCall} />
             <Stack.Screen name="login" component={Login} />
             <Stack.Screen name="SignUp" component={SignUp} />
             <Stack.Screen name="TermofServices" component={TermofServices} />
