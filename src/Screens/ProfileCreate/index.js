@@ -43,6 +43,7 @@ import {
   getRequestWithCookie,
   postRequestWithTokenAndCookie,
 } from '../../App/fetch';
+import app from '../../Firebase/firebaseConfig';
 
 export const ProfileCreate = ({route}) => {
   const Navigation = useNavigation();
@@ -210,6 +211,16 @@ export const ProfileCreate = ({route}) => {
       )
         .then(result => {
           console.log('result of update profile', result);
+          app
+            .database()
+            .ref(`users/${AuthReducer.userData.token}`)
+            .update({
+              display_name: valueFullName,
+              profileImage: `https://nextgenbulliontool.com${AuthReducer?.userData?.user?.profile?.profile_pic}`,
+            })
+            .then(() =>
+              console.log('User data created successfully in database'),
+            );
           setModalVisible(true);
           setLoading(false);
         })

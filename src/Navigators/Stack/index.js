@@ -24,6 +24,7 @@ import {OtpScreen} from '../../Components/OtpScreen';
 import {ChangeForgetPassword} from '../../Screens/ChangeForgetPassword';
 import {TermofServices} from '../../Screens/TermsOfServices';
 import { ProfileCreate } from '../../Screens/ProfileCreate';
+import { ChatScreen } from '../../Screens/ChatScreen';
 
 export default function StackNavigator({route, navigation}) {
   const Stack = createStackNavigator();
@@ -130,7 +131,7 @@ export default function StackNavigator({route, navigation}) {
               name="SimpleBottomScreen"
               component={SimpleBottomTab}
             />
-
+            <Stack.Screen name="ChatScreen" component={ChatScreen} />
             <Stack.Screen name="Notifications" component={Notifications} />
             <Stack.Screen name="Profile" component={Profile} />
             <Stack.Screen name="EditProfile" component={EditProfile} />

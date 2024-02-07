@@ -10,6 +10,7 @@ import {
   setDataToAsync,
 } from '../../Utils/getAndSetAsyncStorage';
 import {userDataFromAsyncStorage} from '../../Store/Reducers/AuthReducer';
+import app from '../../Firebase/firebaseConfig';
 
 export const OtpInput = props => {
   const inputRefs = useRef([]);
@@ -56,9 +57,33 @@ export const OtpInput = props => {
                     console.log('Not found');
                     Alert.alert('', result?.non_field_errors[0]);
                   } else {
+                    console.log('resultsh', result);
+                    const {
+                      token,
+                      user: {
+                        email,
+                        profile: {display_name},
+                      },
+                    } = result;
+
+                    // Create a new object with the extracted fields
+                    const extractedData = {
+                      token,
+                      email,
+                      display_name,
+                    };
+                    console.log('extractedData', extractedData);
+
                     dispatch(otpScreen(true));
                     setDataToAsync('token', JSON.stringify(result.token));
                     setDataToAsync('user', JSON.stringify(result));
+                    app
+                      .database()
+                      .ref(`users/${extractedData.token}`)
+                      .set(extractedData)
+                      .then(() => console.log('User Data saved.'))
+                      .catch(() => console.log('User Data not saved.'));
+
 
                     // Navigation.navigate('ProfileCreateStart');
                     getDataFromAsync('user')

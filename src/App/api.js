@@ -1,1 +1,1 @@
-export const BASE_URL = 'https://jbpl.pythonanywhere.com/api/v1';
+export const BASE_URL = 'https://nextgenbulliontool.com/api/v1';
