@@ -117,7 +117,7 @@ export const Drawer = () => {
             }}
             resizeMode={'stretch'}
             source={{
-              uri: `https://jbpl.pythonanywhere.com${AuthReducer?.userData?.user?.profile?.profile_pic}`,
+              uri: `https://nextgenbulliontool.com${AuthReducer?.userData?.user?.profile?.profile_pic}`,
             }}
             // source={require('../../Assets/Images/profileIcon.png')}
           />
@@ -133,6 +133,7 @@ export const Drawer = () => {
               Heading={AuthReducer?.userData?.user?.email}
               Fontsize={15}
               color={COLORS.dark}
+              width={190}
               // Fontweight={'bold'}
               // txtAlign={'center'}
             />

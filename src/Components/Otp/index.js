@@ -10,7 +10,10 @@ import {
   setDataToAsync,
 } from '../../Utils/getAndSetAsyncStorage';
 import {userDataFromAsyncStorage} from '../../Store/Reducers/AuthReducer';
+import firebase from '@react-native-firebase/app';
+import database from '@react-native-firebase/database';
 import app from '../../Firebase/firebaseConfig';
+import Toast from 'react-native-toast-message';
 
 export const OtpInput = props => {
   const inputRefs = useRef([]);
@@ -36,32 +39,54 @@ export const OtpInput = props => {
       formdata.append('otp', props.otpValue.current);
 
       console.log('formdata:', formdata);
-      setLoading(true);
+      // setLoading(true);
+      // props.setOtpVerificationLoading(true); // Set loading state in OtpScreen
       postRequest(`${BASE_URL}/users/registration/verify-otp/`, formdata)
         .then(result => {
           console.log(result.success);
           console.log('otp result', result);
-          setLoading(false);
+          // setLoading(false);
           if (result.success) {
             Alert.alert('Verified', result.message);
+            // Toast.show({
+            //   type: 'success',
+            //   text1: 'Verified',
+            //   text2: result.message,
+            //   visibilityTime: 5000,
+            //   position: 'top',
+            //   autoHide: true,
+            //   bottomOffset: 50,
+            // });
             if (props.screenName == 'TermofServices') {
               var formdata = new FormData();
               formdata.append('username', props.email);
               formdata.append('password', props.password);
 
-              setLoading(true);
+              // setLoading(true);
               postRequest(`${BASE_URL}/users/login/token/`, formdata)
                 .then(result => {
-                  setLoading(false);
+                  // setLoading(false);
                   if (result?.non_field_errors) {
                     console.log('Not found');
-                    Alert.alert('', result?.non_field_errors[0]);
+                    // Alert.alert('', result?.non_field_errors[0]);
+                    Toast.show({
+                      type: 'success',
+                      text1: '',
+                      text2: result?.non_field_errors[0],
+                      visibilityTime: 3000,
+                      position: 'top',
+                      autoHide: true,
+                      bottomOffset: 50,
+                    });
+                    // props.setOtpVerificationLoading(false);
                   } else {
                     console.log('resultsh', result);
                     const {
                       token,
                       user: {
                         email,
+                        id,
+                        is_active,
                         profile: {display_name},
                       },
                     } = result;
@@ -71,50 +96,102 @@ export const OtpInput = props => {
                       token,
                       email,
                       display_name,
+                      id,
+                      is_active,
                     };
                     console.log('extractedData', extractedData);
 
-                    dispatch(otpScreen(true));
-                    setDataToAsync('token', JSON.stringify(result.token));
-                    setDataToAsync('user', JSON.stringify(result));
                     app
                       .database()
-                      .ref(`users/${extractedData.token}`)
+                      .ref(`users/${extractedData.id}`)
                       .set(extractedData)
-                      .then(() => console.log('User Data saved.'))
-                      .catch(() => console.log('User Data not saved.'));
+                      .then(() => {
+                        console.log('User Data saved.')
+                        dispatch(otpScreen(true));
+                        setDataToAsync('token', JSON.stringify(result.token));
+                        setDataToAsync('user', JSON.stringify(result));
+                        getDataFromAsync('user')
+                          .then(res => {
+                            dispatch(userDataFromAsyncStorage(JSON.parse(res)));
+                            // props.setOtpVerificationLoading(false); // Reset loading state in OtpScreen
+                          })
+                          .catch(err => {
+                            console.log(
+                              'Error From getting from local storage: ',
+                              err,
+                            );
+                            // props.setOtpVerificationLoading(false); // Reset loading state in OtpScreen
 
+                          });
+                      })
+                      .catch(() => {
+                        console.log('User Data not saved.')
+                        // Alert.alert('Error', 'Something went wrong please try again'); 
+                        Toast.show({
+                          type: 'error',
+                          text1: 'Error',
+                          text2: 'Something went wrong please try again',
+                          visibilityTime: 3000,
+                          position: 'top',
+                          autoHide: true,
+                          bottomOffset: 50,
+                        });
+                        // props.setOtpVerificationLoading(false);
+                      });
+
+                    // dispatch(otpScreen(true));
+                    // setDataToAsync('token', JSON.stringify(result.token));
+                    // setDataToAsync('user', JSON.stringify(result));
+                    // app
+                    //   .database()
+                    //   .ref(`users/${extractedData.token}`)
+                    //   .set(extractedData)
+                    //   .then(() => console.log('User Data saved.'))
+                    //   .catch(() => console.log('User Data not saved.'));
 
                     // Navigation.navigate('ProfileCreateStart');
-                    getDataFromAsync('user')
-                      .then(res => {
-                        dispatch(userDataFromAsyncStorage(JSON.parse(res)));
-                      })
-                      .catch(err => {
-                        console.log(
-                          'Error From getting from local storage: ',
-                          err,
-                        );
-                      });
+                    // getDataFromAsync('user')
+                    //   .then(res => {
+                    //     dispatch(userDataFromAsyncStorage(JSON.parse(res)));
+                    //   })
+                    //   .catch(err => {
+                    //     console.log(
+                    //       'Error From getting from local storage: ',
+                    //       err,
+                    //     );
+                    //   });
                   }
                 })
                 .catch(error => {
                   console.log('error', error);
-                  setLoading(false);
+                  // setLoading(false);
+                  // props.setOtpVerificationLoading(false); // Reset loading state in OtpScreen
                 });
             } else {
               console.log('token', result.token);
               Navigation.navigate('ChangeForgetPassword', result.token);
+              // props.setOtpVerificationLoading(false); // Reset loading state in OtpScreen
             }
           } else {
             setIsAllFieldsFilled(false);
-            Alert.alert('Error', result.message);
+            // Alert.alert('Error', result.message);
+            Toast.show({
+              type: 'error',
+              text1: 'Error',
+              text2: result.message,
+              visibilityTime: 3000,
+              position: 'top',
+              autoHide: true,
+              topOffset: 55,
+            });
+            // props.setOtpVerificationLoading(false); // Reset loading state in OtpScreen
           }
-          setLoading(false);
+          // setLoading(false);
         })
         .catch(error => {
-          setLoading(false);
+          // setLoading(false);
           console.log('error', error);
+          // props.setOtpVerificationLoading(false); // Reset loading state in OtpScreen
         });
       //OTP End checking
     }

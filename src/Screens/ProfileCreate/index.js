@@ -58,6 +58,7 @@ export const ProfileCreate = ({route}) => {
   const [valuePhoneNumber, onChangePhoneNumber] = useState('');
   const [valueAddress, onChangeAddress] = useState('');
   const [profileImage, onChangeProfileImage] = useState('');
+  const [profileImageAddress, onChangeProfileImageAddress] = useState('');
   const [error, onChangeError] = useState('');
   const [loading, setLoading] = useState(false);
   console.log(profileImage);
@@ -140,7 +141,7 @@ export const ProfileCreate = ({route}) => {
     // valueEmail,
     valuePhoneNumber,
     valueAddress,
-    // profileImage,
+    profileImage,
   ) => {
     // Validation for Full Name
     if (!valueFullName.trim()) {
@@ -159,11 +160,19 @@ export const ProfileCreate = ({route}) => {
     // }
 
     // Validation for Phone Number
-    const phoneNumberPattern = /^\(\d{3}\) \d{3}-\d{4}$/;
+    // const phoneNumberPattern = /^\(\d{3}\) \d{3}-\d{4}$/;
+    // if (!valuePhoneNumber.trim()) {
+    //   onChangeError('Phone Number Should not be empty.');
+    //   return false;
+    // } else if (!phoneNumberPattern.test(valuePhoneNumber)) {
+    //   onChangeError('Invalid Phone Number format.');
+    //   return false;
+    // }
+
     if (!valuePhoneNumber.trim()) {
       onChangeError('Phone Number Should not be empty.');
       return false;
-    } else if (!phoneNumberPattern.test(valuePhoneNumber)) {
+    } else if (valuePhoneNumber.length != 10) {
       onChangeError('Invalid Phone Number format.');
       return false;
     }
@@ -175,14 +184,20 @@ export const ProfileCreate = ({route}) => {
     }
 
     // Validation for Profile Image
-    // if (!profileImage) {
-    //   onChangeError('Profile Image Should be uploaded.');
-    //   return false;
-    // }
+    if (!profileImage) {
+      // onChangeError('Please upload a profile picture.');
+      onChangeError('Profile image should be uploaded.');
+      return false;
+      // isValid = false;
+    }
 
     // All fields are valid
     return true;
   };
+
+  // console.log('AuthReducer?.userData?.user?.profile', AuthReducer?.userData?.user?.profile.profile_pic)
+  console.log('AuthReducer?.userData?.user?.profile',  profileImageAddress)
+
 
   function CreateProfile() {
     const isValid = validateFields(
@@ -190,7 +205,7 @@ export const ProfileCreate = ({route}) => {
       // valueEmail,
       valuePhoneNumber,
       valueAddress,
-      // profileImage,
+      profileImage,
     );
     console.log('isValid: ', isValid);
     if (isValid) {
@@ -213,10 +228,10 @@ export const ProfileCreate = ({route}) => {
           console.log('result of update profile', result);
           app
             .database()
-            .ref(`users/${AuthReducer.userData.token}`)
+            .ref(`users/${AuthReducer.userData.user.id}`)
             .update({
               display_name: valueFullName,
-              profileImage: `https://nextgenbulliontool.com${AuthReducer?.userData?.user?.profile?.profile_pic}`,
+              profileImage: profileImageAddress,
             })
             .then(() =>
               console.log('User data created successfully in database'),
@@ -257,7 +272,8 @@ export const ProfileCreate = ({route}) => {
       AuthReducer.userData.token,
     )
       .then(result => {
-        console.log(result);
+        console.log('tttt', result);
+        onChangeProfileImageAddress(result.media_file)
         setLoading(false);
       })
       .catch(error => {
@@ -600,7 +616,8 @@ export const ProfileCreate = ({route}) => {
                     <Input
                       title={'Phone Number'}
                       urlImg={require('../../Assets/Images/phoneIcon.png')}
-                      placeholder={'(123) 456-7890'}
+                      placeholder={'1234567890'}
+                      // placeholder={'(123) 456-7890'}
                       pass={false}
                       value={valuePhoneNumber}
                       onChangeText={onChangePhoneNumber}

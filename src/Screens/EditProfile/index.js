@@ -34,6 +34,7 @@ import {
   getRequestWithCookie,
   postRequestWithTokenAndCookie,
 } from '../../App/fetch';
+import app from '../../Firebase/firebaseConfig';
 
 export const EditProfile = () => {
   const Navigation = useNavigation();
@@ -50,10 +51,11 @@ export const EditProfile = () => {
   const [error, onChangeError] = useState('');
   const [loading, setLoading] = useState(false);
   const [localFullName, setLocalFullName] = useState('');
+  const [profileImageAddress, onChangeProfileImageAddress] = useState('');
   const dispatch = useDispatch();
 
   console.log('data from redux on edit profile ', AuthReducer.user);
-
+  console.log('AuthReducer?.userData?.user?.profile',  profileImageAddress)
 
   useEffect(() => {
     if (AuthReducer.user) {
@@ -137,11 +139,18 @@ export const EditProfile = () => {
 
 
     // Validation for Phone Number
-    const phoneNumberPattern = /^\(\d{3}\) \d{3}-\d{4}$/;
+    // const phoneNumberPattern = /^\(\d{3}\) \d{3}-\d{4}$/;
+    // if (!valuePhoneNumber.trim()) {
+    //   onChangeError('Phone Number is empty.');
+    //   return false;
+    // } else if (!phoneNumberPattern.test(valuePhoneNumber)) {
+    //   onChangeError('Invalid Phone Number format.');
+    //   return false;
+    // }
     if (!valuePhoneNumber.trim()) {
-      onChangeError('Phone Number is empty.');
+      onChangeError('Phone Number Should not be empty.');
       return false;
-    } else if (!phoneNumberPattern.test(valuePhoneNumber)) {
+    } else if (valuePhoneNumber.length != 10) {
       onChangeError('Invalid Phone Number format.');
       return false;
     }
@@ -156,6 +165,11 @@ export const EditProfile = () => {
     // All fields are valid
     return true;
   };
+
+  console.log(
+    'result of image',
+    AuthReducer.user.profile.profile_pic,
+  );
 
   function EditProfile() {
     const isValid = validateFields(
@@ -185,6 +199,16 @@ export const EditProfile = () => {
       )
         .then(result => {
           console.log('result', result);
+          app
+            .database()
+            .ref(`users/${AuthReducer.user.id}`)
+            .update({
+              display_name: localFullName,
+              profileImage: profileImageAddress ? profileImageAddress : AuthReducer.user.profile.profile_pic,
+            })
+            .then(() =>
+              console.log('User data edited successfully in database'),
+            );
 
           setLoading(true);
 
@@ -208,14 +232,14 @@ export const EditProfile = () => {
                 });
             })
             .catch(error => {
-              console.log('error', error);
+              console.log('error 3', error);
               setLoading(false);
             });
           setLoading(false);
           Navigation.goBack();
         })
         .catch(error => {
-          console.log('error', error);
+          console.log('error 4', error);
           setLoading(false);
         });
       onChangeError('');
@@ -257,6 +281,7 @@ export const EditProfile = () => {
           .then(result => {
             console.log(result);
             setLoading(false);
+            onChangeProfileImageAddress(result.media_file)
 
             setDataToAsync('user', JSON.stringify(result));
 
@@ -269,13 +294,13 @@ export const EditProfile = () => {
               });
           })
           .catch(error => {
-            console.log('error', error);
+            console.log('error 1', error);
             setLoading(false);
           });
         setLoading(false);
       })
       .catch(error => {
-        console.log('error', error);
+        console.log('error 2', error);
         setLoading(false);
         Alert.alert('Error', 'Something went wrong please try again');
       });
@@ -350,7 +375,7 @@ export const EditProfile = () => {
                       }}>
                       <Image
                         source={{
-                          uri: `https://jbpl.pythonanywhere.com${AuthReducer?.user?.profile?.profile_pic}`,
+                          uri: `https://nextgenbulliontool.com${AuthReducer?.user?.profile?.profile_pic}`,
                         }}
                         style={{
                           width: 140,
@@ -432,7 +457,8 @@ export const EditProfile = () => {
                       <Input
                         title={'Phone Number'}
                         urlImg={require('../../Assets/Images/phoneIcon.png')}
-                        placeholder={'(123) 456-7890'}
+                        placeholder={'1234567890'}
+                        // placeholder={'(123) 456-7890'}
                         pass={false}
                         value={valuePhoneNumber}
                         onChangeText={onChangePhoneNumber}

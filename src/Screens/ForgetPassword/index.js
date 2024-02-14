@@ -30,7 +30,7 @@ import {BASE_URL} from '../../App/api';
 export const ForgotPassword = () => {
   const [loading, setLoading] = useState(false);
   const [valueEmail, onChangeTextEmail] = useState('');
-  const [error, onChangeError] = useState('');
+  const [errorEmail, setErrorEmail] = useState('');
 
   let loginValidationScheme = yup.object().shape({
     email: yup
@@ -46,15 +46,15 @@ export const ForgotPassword = () => {
   const Navigation = useNavigation();
 
   function isValidEmail(valueEmail) {
-    const emailPattern = /^[a-z][^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailPattern.test(valueEmail);
   }
 
   function ForgetPassword() {
     if (valueEmail.trim() === '') {
-      onChangeError('Email cannot be empty.');
+      setErrorEmail('Email cannot be empty.');
     } else if (!isValidEmail(valueEmail)) {
-      onChangeError('Enter valid email');
+      setErrorEmail('Enter valid email');
     } else {
       // onChangeError('');
       // Navigation.navigate('OtpScreen', {
@@ -73,13 +73,15 @@ export const ForgotPassword = () => {
           if (result.success) {
             setLoading(false);
 
+            // const capitalizedEmail =
+            //   valueEmail.charAt(0).toUpperCase() + valueEmail.slice(1);
             var formdata = new FormData();
             formdata.append('email', valueEmail);
 
             setLoading(true);
             postRequest(`${BASE_URL}/users/registration/resend-otp/`, formdata)
               .then(result => {
-                console.log(result);
+                console.log('result', result);
                 setLoading(false);
                 if (result.success) {
                   // const data = {
@@ -89,6 +91,8 @@ export const ForgotPassword = () => {
                     screenName: 'ForgotPassword',
                     valueEmail: valueEmail,
                   });
+                } else {
+                  Alert.alert('', 'Invalid Email address. please try again');
                 }
               })
               .catch(error => {
@@ -98,15 +102,17 @@ export const ForgotPassword = () => {
               });
           } else {
             setLoading(false);
-            onChangeError("Account Doesn't Exists");
+            // setErrorEmail("Account Doesn't Exists");
+            Alert.alert('', "Account Doesn't Exists");
           }
         })
         .catch(error => {
           setLoading(false);
-          console.log('error', error);
+          console.log('error', error.message);
+          Alert.alert('', error);
           onChangeTextEmail('');
         });
-      onChangeError('');
+      setErrorEmail('');
     }
   }
 
@@ -162,7 +168,7 @@ export const ForgotPassword = () => {
                       }}
                     />
                   </Pressable>
-                  <View
+                  {/* <View
                     style={{
                       width: '80%',
                       // alignItemss: 'center',
@@ -178,22 +184,19 @@ export const ForgotPassword = () => {
                         />
                       </>
                     )}
-                  </View>
+                  </View> */}
                 </View>
-                <View
+                {/* <View
                   style={{
                     alignItems: 'center',
                     marginTop: 40,
-                    width: 100,
-                    height: 100,
-                    backgroundColor: 'white',
                   }}>
-                  {/* <Image
+                  <Image
                     source={require('../../Assets/Images/forgotPassword.png')}
                     style={{width: 100, height: 100}}
                     resizeMode={'contain'}
-                  /> */}
-                </View>
+                  />
+                </View> */}
                 <View style={{alignItems: 'center'}}></View>
                 <View
                   style={{
@@ -247,17 +250,19 @@ export const ForgotPassword = () => {
                         pass={false}
                         value={valueEmail}
                         onChangeText={onChangeTextEmail}
+                        keyboardType={'email-address'}
+                        autoCapitalize={'none'}
                       />
-                      {errors.email && touched.email && (
+                      {!!errorEmail && (
                         <Text
                           style={{
                             fontSize: 12,
                             color: 'red',
                             marginTop: 5,
-                            marginBottom: 5,
-                            marginLeft: 15,
+                            // marginBottom: 15,
+                            marginLeft: 37,
                           }}>
-                          {errors.email}
+                          {'*' + errorEmail}
                         </Text>
                       )}
                     </View>

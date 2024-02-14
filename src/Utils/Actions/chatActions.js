@@ -65,7 +65,8 @@ import {getUserPushTokens} from './authAction';
 
 export const sendTextMessage = async (chatId, senderData, messageText) => {
   try {
-    await sendMessage(chatId, senderData.token, messageText);
+    console.log('chatId', chatId, 'senderData', senderData, 'messageText', messageText)
+    await sendMessage(chatId, senderData, messageText);
   } catch (error) {
     console.log(error);
   }
@@ -117,23 +118,58 @@ const sendMessage = async (chatId, senderId, messageText) => {
       text: messageText,
       timestamp: firebase.database.ServerValue.TIMESTAMP,
     };
+    console.log('messageData111111', messageData)
     const messageRef = database()
       .ref(`messages/${chatId}/${senderId}`)
       .push(messageData)
       .then(res => console.log('userMsgSaved'))
       .catch(err => console.log('userMsgNotSaved'));
+    const messageRef2 = database()
+      .ref(`messages/${senderId}/${chatId}`)
+      .push(messageData)
+      .then(res => console.log('userMsgSaved'))
+      .catch(err => console.log('userMsgNotSaved'));
 
     const chatRef = database().ref(`chats/${chatId}`);
+    const chatRef2 = database().ref(`chats/${senderId}`);
+
     await chatRef.update({
       updatedBy: senderId,
       updatedAt: new Date().toISOString(),
       latestMessage: messageText,
       user: {RecieverId: chatId, senderId},
     });
-    const userRef = database().ref(`users/${chatId}`);
-    await userRef.update({
+    await chatRef2.update({
+      updatedBy: senderId,
+      updatedAt: new Date().toISOString(),
       latestMessage: messageText,
+      user: {RecieverId: chatId, senderId},
     });
+
+    const latestRef = database().ref(`latest/${chatId}/${senderId}`);
+    const latestRef2 = database().ref(`latest/${senderId}/${chatId}`);
+
+    await latestRef.update({
+      latestMessage: messageText,
+      seen: false,
+      senderId: senderId
+    });
+    await latestRef2.update({
+      latestMessage: messageText,
+      seen: false,
+      senderId: senderId
+    });
+
+    // const userRef = database().ref(`users/${chatId}`);
+    // const userRef2 = database().ref(`users/${senderId}`);
+    // await userRef.update({
+    //   latestMessage: messageText,
+    //   seenMyMessage: false,
+    // });
+    // await userRef2.update({
+    //   latestMessage: messageText,
+    //   seenYourMessage: false,
+    // });
   } catch (error) {
     console.log(error);
   }

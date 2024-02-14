@@ -13,6 +13,7 @@ import {Provider, useDispatch, useSelector} from 'react-redux';
 import {Store} from './src/Store';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Toast from 'react-native-toast-message';
 
 const App = () => {
   LogBox.ignoreLogs([
@@ -28,6 +29,7 @@ const App = () => {
       <Provider store={Store}>
         <PaperProvider>
           <StackNavigator />
+          <Toast />
         </PaperProvider>
       </Provider>
     </GestureHandlerRootView>

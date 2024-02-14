@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Image,
   ImageBackground,
@@ -11,23 +11,26 @@ import {
   SafeAreaView,
   Alert,
 } from 'react-native';
-import {ActivityIndicator, Button, Text} from 'react-native-paper';
+import { ActivityIndicator, Button, Text } from 'react-native-paper';
 import Heading from '../../Components/ReusableComponent/Heading';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import ButtonComp from '../../Components/ReusableComponent/Button';
-import {ScrollView} from 'react-native-gesture-handler';
-import {OtpInput} from '../../Components/Otp';
-import {Loader} from '../ReusableComponent/Loader';
+import { ScrollView } from 'react-native-gesture-handler';
+import { OtpInput } from '../../Components/Otp';
+import { Loader } from '../ReusableComponent/Loader';
 import LinearGradient from 'react-native-linear-gradient';
-import {postRequest} from '../../App/fetch';
-import {BASE_URL} from '../../App/api';
+import { useDispatch } from 'react-redux';
+import { otpScreen } from '../../Store/Reducers/ScreenReducer';
+import { postRequest } from '../../App/fetch';
+import { BASE_URL } from '../../App/api';
 
-export const OtpScreen = ({route}) => {
+export const OtpScreen = ({ route }) => {
   const Navigation = useNavigation();
   console.log('route params: ', route.params);
   // const screenName = route.params.screenName;
 
   const [loading, setLoading] = useState(false);
+  const [otpVerificationLoading, setOtpVerificationLoading] = useState(false);
   const [screenName, setScreenName] = useState('');
   console.log('screenName: ', screenName);
 
@@ -62,13 +65,13 @@ export const OtpScreen = ({route}) => {
 
   return (
     <>
-      {loading ? (
+      {loading || otpVerificationLoading ? (
         <Loader />
       ) : (
-        <View style={{flex: 1}}>
-          <ScrollView style={{flex: 1, flexGrow: 1}}>
+        <View style={{ flex: 1 }}>
+          <ScrollView style={{ flex: 1, flexGrow: 1 }}>
             {/* Header */}
-            <SafeAreaView style={{flex: 1}}>
+            <SafeAreaView style={{ flex: 1 }}>
               <View
                 style={{
                   flexDirection: 'row',
@@ -103,11 +106,11 @@ export const OtpScreen = ({route}) => {
                     />
                   </Pressable>
                 </View>
-                <View style={{marginTop: '6%', height: 10}}>
+                <View style={{ marginTop: '6%', height: 10 }}>
                   <LinearGradient
                     colors={['rgba(11, 16, 92, 1)', 'rgba(64, 123, 255, 1)']}
-                    start={{x: 2, y: 0}}
-                    end={{x: 0, y: 1}}
+                    start={{ x: 2, y: 0 }}
+                    end={{ x: 0, y: 1 }}
                     style={{
                       flex: 1,
                       //   marginLeft: 5,
@@ -134,9 +137,6 @@ export const OtpScreen = ({route}) => {
                 style={{
                   alignItems: 'center',
                   marginTop: 50,
-                  width: 100,
-                  height: 100,
-                  backgroundColor: 'white',
                 }}>
                 {/* <Image
                   source={require('../../Assets/Images/otpLock.png')}
@@ -144,7 +144,7 @@ export const OtpScreen = ({route}) => {
                   resizeMode={'contain'}
                 /> */}
               </View>
-              <View style={{marginTop: '10%', marginHorizontal: '19%'}}>
+              <View style={{ marginTop: '10%', marginHorizontal: '19%' }}>
                 <Heading
                   Fontsize={24}
                   txtAlign={'center'}
@@ -173,6 +173,7 @@ export const OtpScreen = ({route}) => {
                   screenName={screenName}
                   email={route.params.valueEmail}
                   password={route.params.valuePass}
+                  setOtpVerificationLoading={setOtpVerificationLoading} // New prop
                 />
               </View>
 
@@ -188,7 +189,7 @@ export const OtpScreen = ({route}) => {
                   Heading={"Code didn't receive?"}
                   color={'rgba(28, 28, 28, 1)'}
                 />
-                <Pressable onPress={() => ResendOtp()} style={{marginLeft: 3}}>
+                <Pressable onPress={() => ResendOtp()} style={{ marginLeft: 3 }}>
                   <Heading
                     Fontsize={16}
                     // as={'center'}

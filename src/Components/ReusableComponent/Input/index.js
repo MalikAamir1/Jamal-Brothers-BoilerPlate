@@ -143,6 +143,7 @@ export default function Input(props) {
             placeholderTextColor={'#A8A8A8'}
             secureTextEntry={props.pass && !props.dob ? notPressed : false}
             keyboardType={props.keyboardType}
+            autoCapitalize={props.autoCapitalize}
           />
           {props.dob ? (
             <View

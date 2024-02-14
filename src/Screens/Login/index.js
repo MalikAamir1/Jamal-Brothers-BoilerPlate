@@ -221,6 +221,8 @@ export const Login = () => {
                         pass={false}
                         value={valueEmail}
                         onChangeText={onChangeTextEmail}
+                        keyboardType={'email-address'}
+                        autoCapitalize={'none'}
                       />
                       {errors.email && touched.email && (
                         <Text

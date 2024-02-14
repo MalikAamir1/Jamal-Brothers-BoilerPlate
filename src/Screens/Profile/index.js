@@ -79,7 +79,7 @@ export const Profile = ({route}) => {
                 <Image
                   // source={require('../../Assets/Images/profileImage.png')}
                   source={{
-                    uri: `https://jbpl.pythonanywhere.com${AuthReducer?.userData?.user?.profile?.profile_pic}`,
+                    uri: `https://nextgenbulliontool.com${AuthReducer?.userData?.user?.profile?.profile_pic}`,
                   }}
                   style={{
                     alignSelf: 'center',
@@ -120,14 +120,14 @@ export const Profile = ({route}) => {
                   Stylefont={'normal'}
                   // Fontweight={'bold'}
                   Fontsize={13}
-                  txtAlign={'center'}
+                  // txtAlign={'center'}
                   // p={10}
                   // lh={26}
                   Heading={AuthReducer?.userData?.user?.email}
                   color={'rgba(0, 36, 97, 1)'}
                   ml={10}
                   //   mb={20}
-                  //   width={170}
+                    width={170}
                   // mt={10}
                 />
               </View>
